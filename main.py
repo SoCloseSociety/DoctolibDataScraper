@@ -4,7 +4,8 @@ DoctolibDataScraper - Automated Doctolib.fr profile data extraction tool.
 Scrapes doctor profiles from Doctolib search results, extracting names,
 addresses, skills, degrees, and contact information into structured CSV files.
 
-Author: SoClose Society (https://soclose.co)
+Author: SoClose (https://soclose.co) — Digital solutions & software development studio
+Contact: contact@soclose.co
 License: MIT
 Repository: https://github.com/SoCloseSociety/DoctolibDataScraper
 """
@@ -427,7 +428,7 @@ def main() -> None:
     print()
     print("=" * 60)
     print("  DoctolibDataScraper")
-    print("  by SoClose Society - https://soclose.co")
+    print("  by SoClose - https://soclose.co")
     print("=" * 60)
     print()
 

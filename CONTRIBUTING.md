@@ -1,6 +1,6 @@
 # Contributing to DoctolibDataScraper
 
-Thank you for your interest in contributing! **[SoClose Society](https://soclose.co)** welcomes contributions from the community.
+Thank you for your interest in contributing! **[SoClose](https://soclose.co)** welcomes contributions from the community.
 
 ## How to Contribute
 
@@ -53,6 +53,7 @@ Refactor: what was restructured
 ## Questions?
 
 - Open a [discussion](https://github.com/SoCloseSociety/DoctolibDataScraper/discussions) on GitHub
+- Email us at [contact@soclose.co](mailto:contact@soclose.co)
 - Visit [soclose.co](https://soclose.co)
 
 ---

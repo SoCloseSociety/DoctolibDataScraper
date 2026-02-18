@@ -1,50 +1,67 @@
-# DoctolibDataScraper
-
-**Automated web scraper for extracting doctor profile data from [Doctolib.fr](https://www.doctolib.fr)**
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
-[![Selenium](https://img.shields.io/badge/Selenium-WebDriver-green.svg)](https://www.selenium.dev/)
-[![Made by SoClose Society](https://img.shields.io/badge/Made%20by-SoClose%20Society-purple.svg)](https://soclose.co)
-
-> An open-source project by **[SoClose Society](https://soclose.co)** — Building and sharing developer tools for the community.
+<p align="center">
+  <h1 align="center">DoctolibDataScraper</h1>
+  <p align="center">
+    <strong>Free open-source Doctolib.fr web scraper</strong><br>
+    Extract doctor profiles, addresses, skills &amp; degrees automatically with Python.
+  </p>
+  <p align="center">
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+    <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.9%2B-3776AB.svg?logo=python&logoColor=white" alt="Python 3.9+"></a>
+    <a href="https://www.selenium.dev/"><img src="https://img.shields.io/badge/Selenium-WebDriver-43B02A.svg?logo=selenium&logoColor=white" alt="Selenium"></a>
+    <a href="https://soclose.co"><img src="https://img.shields.io/badge/by-SoClose-575ECF.svg" alt="Made by SoClose"></a>
+    <a href="https://github.com/SoCloseSociety/DoctolibDataScraper/stargazers"><img src="https://img.shields.io/github/stars/SoCloseSociety/DoctolibDataScraper?style=social" alt="GitHub Stars"></a>
+  </p>
+</p>
 
 ---
 
-## Overview
+> Built by **[SoClose](https://soclose.co)** — Digital solutions & software development studio specializing in automation and AI integration.
 
-DoctolibDataScraper automates the collection of healthcare provider data from Doctolib search results. It navigates through paginated search results, collects profile links, then visits each profile to extract structured information.
+---
+
+## Why DoctolibDataScraper?
+
+Manually collecting doctor information from [Doctolib.fr](https://www.doctolib.fr) is time-consuming. This Python web scraper automates the entire process: give it a Doctolib search URL, and it extracts every doctor profile into clean, analysis-ready CSV files.
 
 ### What it extracts
 
-| Field | Description |
-|-------|-------------|
-| **Name** | Doctor's full name |
-| **Addresses** | Practice locations with full addresses |
-| **Skills** | Listed medical specializations and competencies |
-| **Degrees** | Educational background, diplomas, and certifications |
-| **Contacts** | Phone numbers and other contact details |
+| Data Field | Example |
+|------------|---------|
+| **Name** | Dr. Marie Dupont |
+| **Addresses** | All practice locations with full addresses |
+| **Skills** | Medical specializations, competencies |
+| **Degrees** | Diplomas, certifications, education history |
+| **Contacts** | Phone numbers, additional contact details |
 
 ### How it works
 
 ```
-Search URL → [Phase 1] Collect Links → [Phase 2] Scrape Profiles → CSV Output
+Doctolib Search URL
+        │
+        ▼
+┌─────────────────────┐
+│  Phase 1: Crawl     │──→ doctolib_profile_link.csv
+│  Paginated results   │
+└─────────────────────┘
+        │
+        ▼
+┌─────────────────────┐
+│  Phase 2: Scrape    │──→ doctolib_profile_details.csv
+│  Each doctor profile │
+└─────────────────────┘
 ```
-
-1. **Phase 1** — Iterates through all search result pages and collects unique profile links → `doctolib_profile_link.csv`
-2. **Phase 2** — Visits each profile (including alternate practice locations) and extracts structured data → `doctolib_profile_details.csv`
 
 ---
 
-## Features
+## Key Features
 
-- **Pagination handling** — Automatically navigates through all search result pages
-- **Multi-location support** — Scrapes data from all practice locations per doctor
-- **VPN integration** — Built-in NordVPN CLI support for IP rotation (optional)
-- **Progressive saving** — Saves data every 5 profiles to prevent data loss
-- **Auto-recovery** — Handles connection failures with automatic retry logic
-- **Cross-platform** — Works on Windows, macOS, and Linux
-- **Clean output** — Structured CSV files ready for analysis
+- **Full pagination** — Automatically crawls all search result pages
+- **Multi-location** — Scrapes every practice location per doctor
+- **VPN rotation** — Built-in NordVPN CLI support to avoid rate limiting *(optional)*
+- **Progressive saving** — Data saved every 5 profiles, no loss on crash
+- **Auto-recovery** — Handles connection drops with smart retry logic
+- **Cross-platform** — Windows, macOS, and Linux
+- **Clean CSV output** — Ready to import in Excel, Google Sheets, or any data tool
 
 ---
 
@@ -52,9 +69,11 @@ Search URL → [Phase 1] Collect Links → [Phase 2] Scrape Profiles → CSV Out
 
 ### Prerequisites
 
-- **Python 3.9+** — [Download](https://www.python.org/downloads/)
-- **Google Chrome** — [Download](https://www.google.com/chrome/)
-- **NordVPN CLI** *(optional)* — For VPN-based IP rotation
+| Requirement | Link |
+|-------------|------|
+| Python 3.9+ | [python.org/downloads](https://www.python.org/downloads/) |
+| Google Chrome | [google.com/chrome](https://www.google.com/chrome/) |
+| NordVPN CLI *(optional)* | For IP rotation during large scrapes |
 
 ### Installation
 
@@ -72,34 +91,34 @@ source venv/bin/activate  # Linux/macOS
 pip install -r requirements.txt
 ```
 
-### Usage
+### Run
 
 ```bash
 python main.py
 ```
 
-When prompted, enter a Doctolib search URL:
+Enter a Doctolib search URL when prompted:
 
 ```
+============================================================
+  DoctolibDataScraper
+  by SoClose Society - https://soclose.co
+============================================================
+
 Enter Doctolib search URL: https://www.doctolib.fr/medecin-generaliste/paris
 ```
 
-The scraper will:
-1. Collect all profile links from search results
-2. Visit each profile and extract data
-3. Save results to CSV files in the project directory
-
-### Output Files
+### Output
 
 | File | Content |
 |------|---------|
-| `doctolib_profile_link.csv` | All unique profile links found |
-| `doctolib_profile_details.csv` | Full extracted profile data |
-| `scraper.log` | Execution log with timestamps |
+| `doctolib_profile_link.csv` | All unique doctor profile links |
+| `doctolib_profile_details.csv` | Full structured profile data |
+| `scraper.log` | Timestamped execution log |
 
 ---
 
-## NordVPN Setup (Optional)
+## NordVPN Setup *(Optional)*
 
 VPN support helps avoid rate limiting during large scraping sessions.
 
@@ -108,15 +127,15 @@ VPN support helps avoid rate limiting during large scraping sessions.
 
 1. Install [NordVPN](https://nordvpn.com/)
 2. Add NordVPN to your PATH: `C:\Program Files\NordVPN\`
-3. Verify: `nordvpn -c` in Command Prompt
+3. Verify in Command Prompt: `nordvpn -c`
 
 </details>
 
 <details>
 <summary><strong>macOS</strong></summary>
 
-1. Install NordVPN via [official site](https://nordvpn.com/) or `brew install nordvpn`
-2. Verify: `nordvpn connect` in Terminal
+1. Install NordVPN via [nordvpn.com](https://nordvpn.com/) or `brew install nordvpn`
+2. Verify in Terminal: `nordvpn connect`
 
 </details>
 
@@ -131,6 +150,18 @@ VPN support helps avoid rate limiting during large scraping sessions.
 
 ---
 
+## Tech Stack
+
+| Technology | Role |
+|------------|------|
+| [Python](https://www.python.org/) | Core language |
+| [Selenium](https://www.selenium.dev/) | Browser automation & page interaction |
+| [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) | HTML parsing & data extraction |
+| [Pandas](https://pandas.pydata.org/) | Data structuring & CSV export |
+| [webdriver-manager](https://github.com/SergeyPirogov/webdriver_manager) | Automatic ChromeDriver management |
+
+---
+
 ## Project Structure
 
 ```
@@ -139,57 +170,48 @@ DoctolibDataScraper/
 ├── requirements.txt     # Python dependencies
 ├── .gitignore           # Git ignore rules
 ├── LICENSE              # MIT License
-├── README.md            # This file
+├── README.md            # Documentation
 └── CONTRIBUTING.md      # Contribution guidelines
 ```
 
 ---
 
-## Tech Stack
+## Other Open-Source Tools by SoClose
 
-| Technology | Purpose |
-|------------|---------|
-| [Selenium](https://www.selenium.dev/) | Browser automation and page interaction |
-| [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) | HTML parsing and data extraction |
-| [Pandas](https://pandas.pydata.org/) | Data structuring and CSV export |
-| [webdriver-manager](https://github.com/SergeyPirogov/webdriver_manager) | Automatic ChromeDriver management |
+| Project | Description | Stars |
+|---------|-------------|-------|
+| [PinterestBulkPostBot](https://github.com/SoCloseSociety/PinterestBulkPostBot) | Free Pinterest bulk upload bot — automate posting hundreds of pins | ![Stars](https://img.shields.io/github/stars/SoCloseSociety/PinterestBulkPostBot?style=flat-square) |
+| [LinkedinDataScraper](https://github.com/SoCloseSociety/LinkedinDataScraper) | Scrape contact info from LinkedIn profiles | ![Stars](https://img.shields.io/github/stars/SoCloseSociety/LinkedinDataScraper?style=flat-square) |
+| [InstagramDataScraper](https://github.com/SoCloseSociety/InstagramDataScraper) | Scrape Instagram profile data | ![Stars](https://img.shields.io/github/stars/SoCloseSociety/InstagramDataScraper?style=flat-square) |
+| [BOT_GoogleMap_Scrapping](https://github.com/SoCloseSociety/BOT_GoogleMap_Scrapping) | Scrape data from Google Maps | ![Stars](https://img.shields.io/github/stars/SoCloseSociety/BOT_GoogleMap_Scrapping?style=flat-square) |
+| [FreeWorkDataScraper](https://github.com/SoCloseSociety/FreeWorkDataScraper) | Scrape job postings from FreeWork | ![Stars](https://img.shields.io/github/stars/SoCloseSociety/FreeWorkDataScraper?style=flat-square) |
 
----
-
-## Disclaimer
-
-This tool is intended for **educational and research purposes only**. Please respect Doctolib's [Terms of Service](https://www.doctolib.fr/terms) and applicable data protection laws (GDPR). Use responsibly and ethically. The authors are not responsible for any misuse of this software.
+**[See all repositories →](https://github.com/SoCloseSociety?tab=repositories)**
 
 ---
 
 ## Contributing
 
-We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**Quick start:** Fork → Branch → Code → PR against `main`
 
 ---
 
-## About SoClose Society
+## Disclaimer
 
-**[SoClose Society](https://soclose.co)** is a developer collective dedicated to building and sharing open-source tools with the community. We believe in collaborative development and making useful software accessible to everyone.
-
-- **Website:** [soclose.co](https://soclose.co)
-- **GitHub:** [github.com/SoCloseSociety](https://github.com/SoCloseSociety)
-
-### Other Projects
-
-Explore our other open-source projects on our [GitHub organization](https://github.com/SoCloseSociety).
+This tool is for **educational and research purposes only**. Respect Doctolib's [Terms of Service](https://www.doctolib.fr/terms) and applicable data protection laws (GDPR). The authors are not responsible for any misuse.
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
-Copyright (c) 2022-2026 [SoClose Society](https://soclose.co)
+[MIT License](LICENSE) — Copyright (c) 2022-2026 [SoClose](https://soclose.co)
 
 ---
 
 <p align="center">
-  <strong>Built with purpose by <a href="https://soclose.co">SoClose Society</a></strong><br>
-  <em>Open source. Community driven. Always free.</em>
+  <a href="https://soclose.co"><strong>SoClose</strong></a> · Digital solutions & software development studio<br>
+  <a href="https://soclose.co">Website</a> · <a href="https://github.com/SoCloseSociety">GitHub</a> · <a href="mailto:contact@soclose.co">contact@soclose.co</a><br><br>
+  <em>If this tool helped you, give it a</em> <a href="https://github.com/SoCloseSociety/DoctolibDataScraper/stargazers">star</a> ⭐
 </p>
