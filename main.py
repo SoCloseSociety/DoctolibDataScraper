@@ -1,5 +1,4 @@
-"""
-DoctolibDataScraper - Automated Doctolib.fr profile data extraction tool.
+# DoctolibDataScraper - Automated Doctolib.fr profile data extraction tool.
 
 Scrapes doctor profiles from Doctolib search results, extracting names,
 addresses, skills, degrees, and contact information into structured CSV files.
@@ -8,14 +7,13 @@ Author: SoClose (https://soclose.co) — Digital solutions & software developmen
 Contact: contact@soclose.co
 License: MIT
 Repository: https://github.com/SoCloseSociety/DoctolibDataScraper
-"""
 
 import logging
 import platform
 import socket
 import subprocess
 import sys
-import time
+time
 
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -92,7 +90,6 @@ def ensure_connectivity() -> None:
         logger.error("Failed to establish connectivity after %d attempts.", max_retries)
         sys.exit(1)
 
-
 # ---------------------------------------------------------------------------
 # Browser utilities
 # ---------------------------------------------------------------------------
@@ -126,8 +123,8 @@ def safe_get(driver: webdriver.Chrome, url: str, wait_class: str) -> webdriver.C
                 EC.presence_of_element_located((By.CLASS_NAME, wait_class))
             )
             return driver
-        except Exception:
-            logger.warning("Page load failed for %s (attempt %d/%d).", url, attempt + 1, max_retries)
+        except Exception as e:
+            logger.warning("Page load failed for %s (attempt %d/%d): %s", url, attempt + 1, max_retries, str(e))
             try:
                 driver.quit()
             except Exception:
@@ -140,10 +137,11 @@ def safe_get(driver: webdriver.Chrome, url: str, wait_class: str) -> webdriver.C
 
 
 def scroll_page(driver: webdriver.Chrome) -> None:
-    """Scroll to the bottom of the page to trigger lazy-loaded content."""
+    """
+    Scroll to the bottom of the page to trigger lazy-loaded content.
+    """
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(SCROLL_PAUSE)
-
 
 # ---------------------------------------------------------------------------
 # Scraping: search results (Phase 1)
@@ -151,7 +149,9 @@ def scroll_page(driver: webdriver.Chrome) -> None:
 
 
 def scrape_search_page(soup: BeautifulSoup) -> list[str]:
-    """Extract doctor profile links from a single search results page."""
+    """
+    Extract doctor profile links from a single search results page.
+    """
     links = []
     for tag in soup.find_all("a", class_="dl-search-result-name js-search-result-path", href=True):
         links.append(tag["href"])
@@ -159,17 +159,27 @@ def scrape_search_page(soup: BeautifulSoup) -> list[str]:
 
 
 def scrape_all_search_results(search_url: str) -> list[str]:
-    """Iterate through all paginated search results and collect profile links."""
+    """
+    Iterate through all paginated search results and collect profile links.
+    """
     logger.info("Phase 1: Collecting profile links from search results...")
     driver = create_driver()
 
     # --- first page ---
-    driver = safe_get(driver, search_url, "results")
-    scroll_page(driver)
+    try:
+        driver = safe_get(driver, search_url, "results")
+        scroll_page(driver)
 
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-    all_links = scrape_search_page(soup)
-    logger.info("Page 1: found %d links.", len(all_links))
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        all_links = scrape_search_page(soup)
+        logger.info("Page 1: found %d links.", len(all_links))
+    except Exception as e:
+        logger.error("Failed to load first page: %s", str(e))
+        try:
+            driver.quit()
+        except Exception:
+            pass
+        return []
 
     # --- subsequent pages ---
     page = 2
@@ -180,8 +190,8 @@ def scrape_all_search_results(search_url: str) -> list[str]:
             WebDriverWait(driver, PAGE_LOAD_WAIT).until(
                 EC.presence_of_element_located((By.XPATH, '//*[@id="doctor_search_bar"]'))
             )
-        except Exception:
-            logger.warning("Search bar not found on page %d. Reconnecting...", page)
+        except Exception as e:
+            logger.warning("Search bar not found on page %d. Reconnecting...: %s", page, str(e))
             try:
                 driver.quit()
             except Exception:
@@ -190,7 +200,7 @@ def scrape_all_search_results(search_url: str) -> list[str]:
             driver = create_driver()
             try:
                 driver = safe_get(driver, page_url, "results")
-            except Exception:
+            except Exception as e:
                 logger.info("End of search results at page %d.", page)
                 break
 
@@ -231,11 +241,12 @@ def scrape_all_search_results(search_url: str) -> list[str]:
 
 
 def save_links_csv(links: list[str], filepath: str) -> None:
-    """Save profile links to a CSV file."""
+    """
+    Save profile links to a CSV file.
+    """
     df = pd.DataFrame({"profile_link": links})
     df.to_csv(filepath, index=False)
     logger.info("Links saved to %s.", filepath)
-
 
 # ---------------------------------------------------------------------------
 # Scraping: individual profiles (Phase 2)
@@ -243,7 +254,9 @@ def save_links_csv(links: list[str], filepath: str) -> None:
 
 
 def extract_address(soup: BeautifulSoup) -> str:
-    """Extract practice name and address from a profile page."""
+    """
+    Extract practice name and address from a profile page.
+    """
     try:
         section = soup.find("div", class_="dl-profile-address-picker-address-text")
         if not section:
@@ -259,7 +272,9 @@ def extract_address(soup: BeautifulSoup) -> str:
 
 
 def extract_skills(soup: BeautifulSoup) -> list[str]:
-    """Extract skills list from a profile page."""
+    """
+    Extract skills list from a profile page.
+    """
     skills = []
     try:
         skills_section = soup.find("div", id="skills")
@@ -272,7 +287,9 @@ def extract_skills(soup: BeautifulSoup) -> list[str]:
 
 
 def extract_degrees(soup: BeautifulSoup) -> list[str]:
-    """Extract degrees and achievements from a profile page."""
+    """
+    Extract degrees and achievements from a profile page.
+    """
     degrees = []
     try:
         sections = soup.find_all("div", class_="dl-profile-card-section dl-profile-history")
@@ -296,168 +313,9 @@ def extract_degrees(soup: BeautifulSoup) -> list[str]:
 
 
 def extract_contact(soup: BeautifulSoup) -> list[str]:
-    """Extract contact info (excluding opening hours) from a profile page."""
+    """
+    Extract contact info (excluding opening hours) from a profile page.
+    """
     contacts = []
-    try:
-        contact_section = soup.find("div", id="openings_and_contact")
-        if not contact_section:
-            return contacts
-        for box in contact_section.find_all("div", class_="dl-profile-box"):
-            subtitle = box.find("h4", class_="dl-profile-card-subtitle")
-            if not subtitle:
-                continue
-            header_text = subtitle.text.strip()
-            if "Horaires d'ouverture" in header_text:
-                continue
-            content_div = box.find("div")
-            content = content_div.text.strip() if content_div else ""
-            contacts.append(f"{header_text}: {content}")
-    except AttributeError as exc:
-        logger.debug("Contact extraction issue: %s", exc)
-    return contacts
 
-
-def scrape_profile(driver: webdriver.Chrome, profile_path: str) -> dict:
-    """
-    Scrape a single doctor profile page and return extracted data.
-    Also visits alternate practice location tabs if available.
-    """
-    url = f"{BASE_URL}{profile_path}"
-    driver = safe_get(driver, url, "dl-profile-header-name")
-    scroll_page(driver)
-
-    soup = BeautifulSoup(driver.page_source, "html.parser")
-
-    # Name
-    name_el = soup.find("h1", class_="dl-profile-header-name")
-    name = name_el.text.strip() if name_el else "Unknown"
-
-    # Primary location data
-    addresses = [extract_address(soup)]
-    all_skills = extract_skills(soup)
-    all_degrees = extract_degrees(soup)
-    contacts = extract_contact(soup)
-
-    # Check for additional practice locations (tabs)
-    base_path = profile_path.split("?")[0]
-    alt_links = []
-    for tag in soup.find_all("a", class_="dl-text", href=True):
-        href = tag["href"]
-        if base_path in href and href != profile_path:
-            alt_links.append(href)
-
-    for alt_link in alt_links:
-        alt_url = f"{BASE_URL}{alt_link}"
-        driver = safe_get(driver, alt_url, "dl-profile-header-name")
-        scroll_page(driver)
-        alt_soup = BeautifulSoup(driver.page_source, "html.parser")
-
-        addr = extract_address(alt_soup)
-        if addr:
-            addresses.append(addr)
-
-        alt_skills = extract_skills(alt_soup)
-        all_skills.extend(s for s in alt_skills if s not in all_skills)
-
-        alt_degrees = extract_degrees(alt_soup)
-        all_degrees.extend(d for d in alt_degrees if d not in all_degrees)
-
-        alt_contacts = extract_contact(alt_soup)
-        contacts.extend(c for c in alt_contacts if c not in contacts)
-
-    return {
-        "name": name,
-        "addresses": "\n".join(addresses),
-        "skills": ", ".join(all_skills),
-        "degrees": "\n".join(all_degrees),
-        "contacts": "\n".join(contacts),
-    }
-
-
-def scrape_all_profiles(links: list[str]) -> None:
-    """Scrape all profiles and progressively save to CSV."""
-    logger.info("Phase 2: Scraping %d profiles...", len(links))
-
-    results = []
-    driver = create_driver()
-
-    for idx, link in enumerate(links, start=1):
-        logger.info("[%d/%d] Scraping: %s", idx, len(links), link)
-        try:
-            data = scrape_profile(driver, link)
-            results.append(data)
-            logger.info("  -> %s", data["name"])
-        except Exception as exc:
-            logger.error("  -> Failed to scrape %s: %s", link, exc)
-            results.append({
-                "name": "ERROR",
-                "addresses": link,
-                "skills": "",
-                "degrees": "",
-                "contacts": str(exc),
-            })
-            # Recreate driver on failure
-            try:
-                driver.quit()
-            except Exception:
-                pass
-            ensure_connectivity()
-            driver = create_driver()
-
-        # Progressive save every 5 profiles
-        if idx % 5 == 0 or idx == len(links):
-            df = pd.DataFrame(results)
-            df.to_csv(OUTPUT_DETAILS_CSV, index=False)
-            logger.info("  -> Progress saved (%d/%d).", idx, len(links))
-
-    try:
-        driver.quit()
-    except Exception:
-        pass
-
-    logger.info("Phase 2 complete: %d profiles scraped.", len(results))
-
-
-# ---------------------------------------------------------------------------
-# Main entry point
-# ---------------------------------------------------------------------------
-
-
-def main() -> None:
-    """Main execution flow."""
-    print()
-    print("=" * 60)
-    print("  DoctolibDataScraper")
-    print("  by SoClose - https://soclose.co")
-    print("=" * 60)
-    print()
-
-    search_url = input("Enter Doctolib search URL: ").strip()
-    if not search_url:
-        logger.error("No URL provided. Exiting.")
-        sys.exit(1)
-
-    if not search_url.startswith("http"):
-        search_url = f"{BASE_URL}{search_url}"
-
-    # Phase 1 - Collect links
-    links = scrape_all_search_results(search_url)
-    save_links_csv(links, OUTPUT_LINKS_CSV)
-
-    if not links:
-        logger.warning("No profile links found. Exiting.")
-        sys.exit(0)
-
-    # Phase 2 - Scrape profiles
-    scrape_all_profiles(links)
-
-    print()
-    print("=" * 60)
-    print(f"  Done! {len(links)} profiles scraped.")
-    print(f"  Links:   {OUTPUT_LINKS_CSV}")
-    print(f"  Details: {OUTPUT_DETAILS_CSV}")
-    print("=" * 60)
-
-
-if __name__ == "__main__":
-    main()
+... (truncated, 164 more lines)
