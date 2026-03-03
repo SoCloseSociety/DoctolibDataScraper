@@ -140,9 +140,21 @@ def safe_get(driver: webdriver.Chrome, url: str, wait_class: str) -> webdriver.C
 
 
 def scroll_page(driver: webdriver.Chrome) -> None:
-    """Scroll to the bottom of the page to trigger lazy-loaded content."""
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(SCROLL_PAUSE)
+    """Scroll to the bottom of the page and wait for new content to load."""
+    last_height = driver.execute_script("return document.body.scrollHeight")
+
+    while True:
+        # Scroll down to the bottom of the page
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+
+        # Wait for the page to load
+        time.sleep(SCROLL_PAUSE)
+
+        # Calculate new scroll height and compare with last scroll height
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
 
 
 # ---------------------------------------------------------------------------
