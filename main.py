@@ -34,9 +34,10 @@ from webdriver_manager.chrome import ChromeDriverManager
 BASE_URL = "https://www.doctolib.fr"
 OUTPUT_LINKS_CSV = "doctolib_profile_link.csv"
 OUTPUT_DETAILS_CSV = "doctolib_profile_details.csv"
-VPN_RECONNECT_DELAY = 10  # seconds
-PAGE_LOAD_WAIT = 8  # seconds (WebDriverWait timeout)
-SCROLL_PAUSE = 2  # seconds after scroll
+import os
+VPN_RECONNECT_DELAY = int(os.getenv('VPN_RECONNECT_DELAY', '10'))  # seconds
+PAGE_LOAD_WAIT = int(os.getenv('PAGE_LOAD_WAIT', '8'))  # seconds (WebDriverWait timeout)
+SCROLL_PAUSE = int(os.getenv('SCROLL_PAUSE', '2'))  # seconds after scroll
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -69,12 +70,13 @@ def is_connected(host: str = "one.one.one.one", port: int = 80, timeout: int = 3
 
 def vpn_connect() -> None:
     """Attempt to connect via NordVPN CLI (cross-platform)."""
-    cmd = ["nordvpn", "-c"] if platform.system() == "Windows" else ["nordvpn", "connect"]
+    nordvpn_command = os.getenv('NORDVPN_COMMAND', 'nordvpn')
+    cmd = [nordvpn_command, "-c"] if platform.system() == "Windows" else [nordvpn_command, "connect"]
     try:
         subprocess.run(cmd, check=False, timeout=30)
         logger.info("VPN connection initiated.")
     except FileNotFoundError:
-        logger.warning("NordVPN CLI not found. Continuing without VPN.")
+        logger.warning(f"{nordvpn_command} CLI not found. Continuing without VPN.")
     except subprocess.TimeoutExpired:
         logger.warning("VPN connection timed out.")
 
