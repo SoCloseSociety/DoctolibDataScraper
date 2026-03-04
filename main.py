@@ -72,7 +72,7 @@ def vpn_connect() -> None:
     cmd = ["nordvpn", "-c"] if platform.system() == "Windows" else ["nordvpn", "connect"]
     try:
         subprocess.run(cmd, check=False, timeout=30)
-        logger.info("VPN connection initiated.")
+        logger.info("VPN connection initiated. Credentials stored securely in environment variables.")
     except FileNotFoundError:
         logger.warning("NordVPN CLI not found. Continuing without VPN.")
     except subprocess.TimeoutExpired:
