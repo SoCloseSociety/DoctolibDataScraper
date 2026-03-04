@@ -31,14 +31,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 # Configuration
 # ---------------------------------------------------------------------------
 
-import os
-
-BASE_URL = os.getenv('DOCTOLIB_BASE_URL', 'https://www.doctolib.fr')
-OUTPUT_LINKS_CSV = os.getenv('DOCTOLIB_OUTPUT_LINKS_CSV', 'doctolib_profile_link.csv')
-OUTPUT_DETAILS_CSV = os.getenv('DOCTOLIB_OUTPUT_DETAILS_CSV', 'doctolib_profile_details.csv')
-VPN_RECONNECT_DELAY = int(os.getenv('DOCTOLIB_VPN_RECONNECT_DELAY', 10))  # seconds
-PAGE_LOAD_WAIT = int(os.getenv('DOCTOLIB_PAGE_LOAD_WAIT', 8))  # seconds (WebDriverWait timeout)
-SCROLL_PAUSE = int(os.getenv('DOCTOLIB_SCROLL_PAUSE', 2))  # seconds after scroll
+BASE_URL = "https://www.doctolib.fr"
+OUTPUT_LINKS_CSV = "doctolib_profile_link.csv"
+OUTPUT_DETAILS_CSV = "doctolib_profile_details.csv"
+VPN_RECONNECT_DELAY = 10  # seconds
+PAGE_LOAD_WAIT = 8  # seconds (WebDriverWait timeout)
+SCROLL_PAUSE = 2  # seconds after scroll
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -49,7 +47,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler("scraper.log", encoding="utf-8"),
+        logging.FileHandler(os.getenv('DOCTOLIB_LOG_FILE', 'scraper.log'), encoding="utf-8"),
     ],
 )
 logger = logging.getLogger(__name__)
