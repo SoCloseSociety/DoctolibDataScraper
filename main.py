@@ -47,7 +47,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-        logging.FileHandler(os.getenv('DOCTOLIB_LOG_FILE', 'scraper.log'), encoding="utf-8"),
+        logging.FileHandler("scraper.log", encoding="utf-8"),
     ],
 )
 logger = logging.getLogger(__name__)
@@ -69,6 +69,11 @@ def is_connected(host: str = "one.one.one.one", port: int = 80, timeout: int = 3
 
 def vpn_connect() -> None:
     """Attempt to connect via NordVPN CLI (cross-platform)."""
+    username = os.getenv('NORDVPN_USERNAME')
+    password = os.getenv('NORDVPN_PASSWORD')
+    if not username or not password:
+        logger.warning("NordVPN credentials missing. Continuing without VPN.")
+        return
     cmd = ["nordvpn", "-c"] if platform.system() == "Windows" else ["nordvpn", "connect"]
     try:
         subprocess.run(cmd, check=False, timeout=30)
