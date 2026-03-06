@@ -71,12 +71,14 @@ def vpn_connect() -> None:
     """Attempt to connect via NordVPN CLI (cross-platform)."""
     cmd = ["nordvpn", "-c"] if platform.system() == "Windows" else ["nordvpn", "connect"]
     try:
-        subprocess.run(cmd, check=False, timeout=30)
+        subprocess.run(cmd, check=True, timeout=30)
         logger.info("VPN connection initiated.")
     except FileNotFoundError:
         logger.warning("NordVPN CLI not found. Continuing without VPN.")
     except subprocess.TimeoutExpired:
         logger.warning("VPN connection timed out.")
+    except subprocess.CalledProcessError as e:
+        logger.error("Failed to connect via NordVPN: %s", e)
 
 
 def ensure_connectivity() -> None:
